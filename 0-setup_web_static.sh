@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #sets up web servers for the deployment of web_static
 
-if ! which nginx > /dev/null 2>/dev/null; then
+if ! command -v nginx > /dev/null 2>/dev/null; then
 	sudo apt-get update
 	sudo apt-get -y install nginx
 fi
