@@ -1,19 +1,40 @@
 #!/usr/bin/python3
 """
-distributes an archive to your web servers, using the function do_deploy
+Write a Fabric script (based on the file 1-pack_web_static.py) that distributes
+an archive to your web servers, using the function do_deploy
 """
 
-from fabric.api import env, put, run
-from os.path import exists, basename
+from fabric.api import local, put, run, env
+from datetime import datetime
+from os.path import exists
+env.hosts = ['52.87.255.220', '3.89.146.3']
 
-env.hosts = [ '52.87.255.220', '3.89.146.3' ]
-env.user = 'ubuntu'
+
+def do_pack():
+    """
+    function to generate .tgz archive
+    """
+
+    # create versions folder if it doesn't exist
+    local("mkdir -p versions")
+
+    # generate archive name based on current date and time
+    now = datetime.now()
+    archive_name = "web_static_{}{}{}{}{}{}.tgz".format(
+            now.year, now.month, now.day, now.hour, now.minute, now.second)
+
+    # compress content of web_static folder into a .tgz archive
+    result = local("tar -cvzf versions/{} web_static".format(archive_name))
+
+    # check if archive was successfully generated
+    if result.failed:
+        return None
+    else:
+        return ("versions/{}".format(archive_name))
 
 
 def do_deploy(archive_path):
-    """
-    function to distribute an archive to web servers
-    """
+    """distributes an archive to the web servers"""
     if exists(archive_path) is False:
         return False
     try:
@@ -29,5 +50,5 @@ def do_deploy(archive_path):
         run('rm -rf /data/web_static/current')
         run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
         return True
-    except:
+    except Exception:
         return False
