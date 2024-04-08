@@ -41,7 +41,7 @@ def do_deploy(archive_path):
         return False
 
     try:
-        # extract necessary information from archive path 
+        # extract necessary information from archive path
         file_n = archive_path.split("/")[-1]
         no_ext = file_n.split(".")[0]
         path = "/data/web_static/releases/"
